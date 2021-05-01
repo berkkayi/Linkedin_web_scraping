@@ -1,6 +1,7 @@
 from selenium import webdriver
 from webdriver_manager.firefox import GeckoDriverManager
 from selenium.webdriver.common.keys import Keys
+import json
 import time
 
 
@@ -71,19 +72,25 @@ for i in range(1,3):
     browser.execute_script("window.scrollTo(0,scrollHeight)")'''
 
 def main():
+    with open("passwd.json","r") as f:
+        passwd = json.load(f)
+    with open("search_pattern.json") as f:
+        search_pattern = json.load(f)
+
     browser = webdriver.Firefox(executable_path=GeckoDriverManager().install())
     url = "https://www.linkedin.com/login"
-    email = "berkkayi3@gmail.com"
-    password = "cemberk7759"
-    search_pattern = "java devoloper"
+    email = passwd["email"]
+    password = passwd["password"]
+    search_pattern = search_pattern["search_pattern"]
     seperator_txt = "\n\n\n-------------------------"
-    bot = Linkedin(browser,url,email,password,search_pattern)
-    bot.login()
-    bot.search()
-    bot.rolling_window(3)
-    time.sleep(5)
-    bot.scrapping_employee(seperator_txt)
-    print("complated !")
+    for pattern in search_pattern:
+        bot = Linkedin(browser,url,email,password,pattern)
+        bot.login()
+        bot.search()
+        bot.rolling_window(3)
+        time.sleep(5)
+        bot.scrapping_employee(seperator_txt)
+        print(f" {pattern} complated !")
     bot.close()
 
 if __name__ == '__main__':
